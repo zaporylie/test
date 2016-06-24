@@ -1,0 +1,49 @@
+# Example how to run behat tests
+# - Copy this file to root of your drupal project (drupal root)
+# - behat.yml should be placed in root/tests
+# - install site
+# - run tests: `docker-compose run --rm behat`
+
+version: '2'
+
+services:
+  db:
+    image: drupaldocker/mariadb
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'True'
+    networks:
+      - back-tier
+  app:
+    image: drupaldocker/php-dev:apache
+    networks:
+      - back-tier
+      - front-tier
+    ports:
+      - 80
+    volumes:
+      - ./:/var/www/html
+  behat:
+    image: zaporylie/behat
+    networks:
+      - back-tier
+      - front-tier
+    volumes_from:
+      - app
+    environment:
+      BASE_URL: "http://app"
+      DRUPAL_ROOT: /var/www/html
+      TESTS_DIR: /var/www/html/tests
+    depends_on:
+      - db
+      - app
+      - phantomjs
+  phantomjs:
+    image: zaporylie/phantomjs
+    networks:
+      - front-tier
+
+networks:
+  front-tier:
+    driver: bridge
+  back-tier:
+    driver: bridge
