@@ -6,4 +6,4 @@ fi
 # Go to test directory.
 cd ${TEST_DIR}
 # Run tests.
-/root/.composer/vendor/bin/behat
+/root/.composer/vendor/bin/behat --colors
